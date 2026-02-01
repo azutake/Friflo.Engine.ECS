@@ -93,6 +93,7 @@ public sealed class Archetype
     [Browse(Never)] private             ArchetypeQuery      query;          //  8   - return the entities of this archetype
     [Browse(Never)] internal            TypeCache           componentAdd;   // 24
     [Browse(Never)] internal            TypeCache           componentRemove;// 24
+    [Browse(Never)] internal            uint[]              heapVersions;   // 8    - versions for each component type (by structIndex)
     #endregion
     
 #region public methods
@@ -157,6 +158,16 @@ public sealed class Archetype
         Resize(this, newCapacity);
         return memory.capacity - entityCount;
     }
+
+    /// <summary>
+    /// Returns the change version for the specified component type index (structIndex).
+    /// </summary>
+    public uint GetHeapVersion(int structIndex) => heapVersions[structIndex];
+
+    /// <summary>
+    /// Sets the change version for the specified component type index (structIndex).
+    /// </summary>
+    public void SetHeapVersion(int structIndex, uint version) => heapVersions[structIndex] = version;
     #endregion
 
 #region initialize
@@ -176,6 +187,7 @@ public sealed class Archetype
         // componentCount   = 0         // has no components
         // componentTypes   = default   // has no components
         // tags             = default   // has no tags
+        heapVersions    = new uint[config.schema.maxStructIndex];
     }
     
     /// <summary> used by <see cref="AbstractEntityRelations"/> </summary>
@@ -195,6 +207,7 @@ public sealed class Archetype
         key             = new ArchetypeKey(this);
         heapMap[heap.structIndex] = heap;
         heap.SetArchetypeDebug(this);
+        heapVersions    = new uint[config.schema.maxStructIndex];
     }
     
     /// <summary>
@@ -222,6 +235,7 @@ public sealed class Archetype
             heapMap[heap.structIndex] = heap;
             SetStandardComponentHeaps(heap, ref std);
         }
+        heapVersions    = new uint[config.schema.maxStructIndex];
     }
     
     private static void SetStandardComponentHeaps(StructHeap heap, ref StandardComponents std)

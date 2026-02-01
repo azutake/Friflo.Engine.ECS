@@ -111,16 +111,18 @@ public readonly struct Chunk<T>
     public override     string      ToString()  => $"{typeof(T).Name}[{Length}]";
 
 
-    internal Chunk(T[] components, int length, int start) {
+    internal Chunk(T[] components, int length, int start, Archetype archetype) {
         Length              = length;
         this.start          = start;
         ArchetypeComponents = components;
+        this.archetype      = archetype;
     }
     
     internal Chunk(Chunk<T> chunk, int start, int length) {
         Length              = length;
         this.start          = start;
         ArchetypeComponents = chunk.ArchetypeComponents;
+        this.archetype      = chunk.archetype;
     }
     
     /// <summary> Return the component at the passed <paramref name="index"/> as a reference. </summary>
@@ -132,6 +134,20 @@ public readonly struct Chunk<T>
             throw new IndexOutOfRangeException();
         }
     }
+
+    [Browse(Never)] internal readonly Archetype archetype;
+
+    /// <summary>
+    /// Returns the change version of this chunk's component type.
+    /// </summary>
+    public uint ChangeVersion => archetype.GetHeapVersion(StructInfo<T>.Index);
+
+    /// <summary>
+    /// Updates the change version of this chunk's component type to the specified version.
+    /// typically EntityStore.GlobalSystemVersion.
+    /// </summary>
+    public void SetChangeVersion(uint version) => archetype.SetHeapVersion(StructInfo<T>.Index, version);
+
 }
 
 internal class ChunkDebugView<T>

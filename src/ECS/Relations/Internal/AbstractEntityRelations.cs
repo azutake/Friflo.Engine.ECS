@@ -165,7 +165,7 @@ internal abstract class AbstractEntityRelations
         int count       = archetype.Count;
         var entities    = new Entities(store, archetype.entityIds, 0, count);
         var components  = ((StructHeap<TRelation>)heap).components;
-        var chunk       = new Chunk<TRelation>(components, count, 0);
+        var chunk       = new Chunk<TRelation>(components, count, 0, archetype);
         return (entities, chunk);
     }
     

@@ -78,6 +78,12 @@ public sealed partial class EntityStore : EntityStoreBase
     
     /// <summary> Return the largest entity <see cref="Entity.Id"/> store in the entity store. </summary>
     [Browse(Never)] public              int                 NodeMaxId        => nodes.Length - 1;
+
+    /// <summary>
+    /// Global version of the system, incremented manually or by system updates.
+    /// Used for ChangeVersion tracking.
+    /// </summary>
+    public              uint                GlobalSystemVersion;
     #endregion
     
 #region events
